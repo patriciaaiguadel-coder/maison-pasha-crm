@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { escapeHtml } from "./html-utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -31,7 +32,7 @@ export async function sendOrderNotificationToSupplier(
       .map(
         (item) => `
         <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.productName}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${escapeHtml(item.productName)}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price.toFixed(2)} ${order.currency}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right; font-weight: bold;">${(item.price * item.quantity).toFixed(2)} ${order.currency}</td>
@@ -74,10 +75,10 @@ export async function sendOrderNotificationToSupplier(
 
             <div class="section">
               <h2>👤 Informations Client</h2>
-              <p><strong>Nom:</strong> ${order.customerName}</p>
+              <p><strong>Nom:</strong> ${escapeHtml(order.customerName)}</p>
               <p><strong>Email:</strong> ${order.customerEmail}</p>
               <p><strong>Téléphone:</strong> ${order.customerPhone || "Non fourni"}</p>
-              <p><strong>Adresse:</strong> ${order.customerAddress || "Non fournie"}</p>
+              <p><strong>Adresse:</strong> ${escapeHtml(order.customerAddress || "Non fournie")}</p>
             </div>
 
             <div class="section">
@@ -141,7 +142,7 @@ export async function sendOrderConfirmationToCustomer(
       .map(
         (item) => `
         <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.productName}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${escapeHtml(item.productName)}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price.toFixed(2)} ${order.currency}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right; font-weight: bold;">${(item.price * item.quantity).toFixed(2)} ${order.currency}</td>
@@ -205,7 +206,7 @@ export async function sendOrderConfirmationToCustomer(
             <div class="section">
               <h2>📦 Livraison</h2>
               <p><strong>Adresse de livraison:</strong></p>
-              <p>${order.customerAddress || "Non fournie"}</p>
+              <p>${escapeHtml(order.customerAddress || "Non fournie"}</p>
               <p>Vous recevrez un email avec le numéro de suivi dès que votre commande sera expédiée.</p>
             </div>
 

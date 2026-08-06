@@ -42,7 +42,7 @@ export class SourcingAgent {
     const prompt = this.buildProductAnalysisPrompt(products);
 
     const message = await client.messages.create({
-      model: 'claude-opus-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [
         {
@@ -59,7 +59,7 @@ export class SourcingAgent {
     const prompt = this.buildTrendAnalysisPrompt(orderHistory);
 
     const message = await client.messages.create({
-      model: 'claude-opus-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [
         {
@@ -92,7 +92,7 @@ export class SourcingAgent {
     `;
 
     const message = await client.messages.create({
-      model: 'claude-opus-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1500,
       messages: [
         {
@@ -128,7 +128,7 @@ export class SourcingAgent {
     `;
 
     const message = await client.messages.create({
-      model: 'claude-opus-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [
         {

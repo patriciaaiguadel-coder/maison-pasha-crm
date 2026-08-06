@@ -13,19 +13,26 @@ export async function POST(request: NextRequest) {
 
     // Get all products from orders
     const orderItems = await prisma.orderItem.findMany({
-      distinct: ['productId'],
       take: 20,
       orderBy: { createdAt: 'desc' }
     });
 
-    const products = orderItems.map(item => ({
-      id: item.productId,
-      name: item.productName,
-      price: item.price,
-      inventory: Math.floor(Math.random() * 100),
-      monthlyVolume: Math.floor(Math.random() * 50) + 10,
-      category: 'Pet Supplies'
-    }));
+    // Remove duplicates
+    const uniqueProducts = new Map();
+    orderItems.forEach(item => {
+      if (!uniqueProducts.has(item.productId)) {
+        uniqueProducts.set(item.productId, {
+          id: item.productId,
+          name: item.productName,
+          price: item.price,
+          inventory: Math.floor(Math.random() * 100),
+          monthlyVolume: Math.floor(Math.random() * 50) + 10,
+          category: 'Pet Supplies'
+        });
+      }
+    });
+
+    const products = Array.from(uniqueProducts.values());
 
     if (products.length === 0) {
       return NextResponse.json({

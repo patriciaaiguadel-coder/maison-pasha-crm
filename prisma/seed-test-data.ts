@@ -1,4 +1,19 @@
 import { PrismaClient } from '@prisma/client';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Load .env.local manually
+const envPath = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  envContent.split('\n').forEach((line) => {
+    if (line && !line.startsWith('#')) {
+      const [key, ...valueParts] = line.split('=');
+      const value = valueParts.join('=').replace(/^"(.*)"$/, '$1');
+      process.env[key.trim()] = value;
+    }
+  });
+}
 
 const prisma = new PrismaClient();
 
@@ -111,11 +126,12 @@ async function main() {
 
       const totalAmount = selectedProducts.reduce((sum, p) => sum + p.price, 0);
 
+      const statuses = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'] as const;
       const order = await prisma.order.create({
         data: {
           customerId: customer.id,
           orderNumber: `#${Date.now()}-${Math.random().toString(36).substring(7)}`,
-          status: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'][Math.floor(Math.random() * 4)],
+          status: statuses[Math.floor(Math.random() * 4)] as any,
           totalAmount,
           currency: 'AED',
           paymentStatus: 'paid',

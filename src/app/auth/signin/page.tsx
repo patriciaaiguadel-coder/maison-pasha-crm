@@ -20,13 +20,11 @@ export default function SignInPage() {
           <LoginForm />
 
           {/* Info Box */}
-          <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-sm text-amber-900">
-              <strong>Demo Account:</strong>
+          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900">
+              <strong>Need help?</strong>
               <br />
-              Email: patricia@maison-pasha.com
-              <br />
-              Password: admin123
+              Contact your administrator for account credentials.
             </p>
           </div>
         </div>

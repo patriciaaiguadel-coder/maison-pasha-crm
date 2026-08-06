@@ -45,7 +45,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const data = JSON.parse(body) as ShopifyOrder;
+    let data: ShopifyOrder;
+    try {
+      data = JSON.parse(body) as ShopifyOrder;
+    } catch (parseError) {
+      console.error('❌ Invalid JSON in webhook body:', parseError);
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
 
     // Log incoming webhook
     await prisma.shopifyWebhook.create({

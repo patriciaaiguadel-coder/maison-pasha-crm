@@ -7,16 +7,21 @@ import crypto from "crypto";
  * @returns true if signature is valid
  */
 export function verifyShopifyWebhook(body: string, signature: string): boolean {
-  const apiSecret = process.env.SHOPIFY_ADMIN_API_PASSWORD;
+  const webhookSecret = process.env.SHOPIFY_WEBHOOK_SECRET;
 
-  if (!apiSecret) {
-    console.error("SHOPIFY_ADMIN_API_PASSWORD not set");
+  if (!webhookSecret) {
+    console.error("SHOPIFY_WEBHOOK_SECRET not set");
     return false;
   }
 
-  // Shopify uses HMAC-SHA256 with the API secret
+  if (!signature) {
+    console.error("HMAC signature header missing");
+    return false;
+  }
+
+  // Shopify uses HMAC-SHA256 with the webhook secret
   const hmac = crypto
-    .createHmac("sha256", apiSecret)
+    .createHmac("sha256", webhookSecret)
     .update(body, "utf8")
     .digest("base64");
 
