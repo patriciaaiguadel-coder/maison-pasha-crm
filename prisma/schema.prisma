@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  role          Role      @default(ADMIN)
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  notes         Note[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Customer {
+  id              String    @id @default(cuid())
+  shopifyId       String?   @unique
+  email           String    @unique
+  firstName       String
+  lastName        String
+  phone           String?
+  address         String?
+  city            String?
+  postalCode      String?
+  country         String?
+  loyaltyPoints   Int       @default(0)
+  totalSpent      Float     @default(0)
+  orders          Order[]
+  notes           Note[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("customers")
+}
+
+model Order {
+  id              String    @id @default(cuid())
+  shopifyId       String?   @unique
+  customerId      String
+  customer        Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderNumber     String    @unique
+  status          OrderStatus @default(PENDING)
+  items           OrderItem[]
+  totalAmount     Float
+  currency        String    @default("AED")
+  paymentStatus   String    @default("pending")
+  notifiedSupplier Boolean   @default(false)
+  supplierStatus  SupplierStatus @default(PENDING)
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  productName String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+
+  @@map("order_items")
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("notes")
+}
+
+model ShopifyWebhook {
+  id        String   @id @default(cuid())
+  topic     String
+  shopifyId String   @unique
+  processed Boolean  @default(false)
+  data      Json     @db.JsonB
+  createdAt DateTime @default(now())
+
+  @@map("shopify_webhooks")
+}
+
+enum Role {
+  ADMIN
+  SUPPLIER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum SupplierStatus {
+  PENDING
+  PREPARING
+  READY
+  SHIPPED
+  DELIVERED
+}
+
+model SourcingAnalysis {
+  id              String    @id @default(cuid())
+  type            String    // "product_analysis", "trend_detection", "supplier_search"
+  productId       String?
+  analysisData    Json      @db.JsonB
+  insights        String[]
+  recommendations SourcingRecommendation[]
+  status          String    @default("completed")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("sourcing_analyses")
+}
+
+model SourcingRecommendation {
+  id              String    @id @default(cuid())
+  analysisId      String
+  analysis        SourcingAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  title           String
+  description     String    @db.Text
+  priority        String    // "HIGH", "MEDIUM", "LOW"
+  type            String    // "supplier_switch", "cost_optimization", "volume_increase"
+  estimatedSavings Float?
+  potentialRevenue Float?
+  confidence      Int       // 0-100
+  actionItems     Json      @db.JsonB // Array of actions
+  status          String    @default("pending") // "pending", "in_progress", "completed", "dismissed"
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("sourcing_recommendations")
+}
+
+model SupplierOpportunity {
+  id              String    @id @default(cuid())
+  productId       String
+  supplierName    String
+  supplierEmail   String?
+  supplierPhone   String?
+  country         String?
+  minOrder        Int?
+  leadTime        Int?      // days
+  pricePerUnit    Float?
+  estimatedSavings Float?
+  quality         String?   // "low", "medium", "high"
+  reliability     String?   // "low", "medium", "high"
+  notes           String?   @db.Text
+  source          String    // "ai_search", "manual", "webhook"
+  verified        Boolean   @default(false)
+  contacted       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("supplier_opportunities")
+}

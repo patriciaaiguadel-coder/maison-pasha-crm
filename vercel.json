@@ -1,0 +1,35 @@
+{
+  "env": [
+    {
+      "key": "DATABASE_URL",
+      "description": "PostgreSQL database URL from Neon or Supabase"
+    },
+    {
+      "key": "NEXTAUTH_SECRET",
+      "description": "Secret for NextAuth (generate with: openssl rand -base64 32)"
+    },
+    {
+      "key": "NEXTAUTH_URL",
+      "description": "Your application URL (will be auto-filled by Vercel)"
+    },
+    {
+      "key": "NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN",
+      "description": "Your Shopify store domain (e.g., maison-pasha.com)"
+    },
+    {
+      "key": "SHOPIFY_ADMIN_API_PASSWORD",
+      "description": "Shopify Admin API access token"
+    },
+    {
+      "key": "RESEND_API_KEY",
+      "description": "Resend API key for email notifications"
+    },
+    {
+      "key": "SUPPLIER_EMAIL",
+      "description": "Supplier email for notifications (e.g., mandy@example.com)"
+    }
+  ],
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install"
+}
