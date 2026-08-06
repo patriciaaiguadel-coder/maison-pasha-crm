@@ -206,7 +206,7 @@ export async function sendOrderConfirmationToCustomer(
             <div class="section">
               <h2>📦 Livraison</h2>
               <p><strong>Adresse de livraison:</strong></p>
-              <p>${escapeHtml(order.customerAddress || "Non fournie"}</p>
+              <p>${escapeHtml(order.customerAddress || "Non fournie")}</p>
               <p>Vous recevrez un email avec le numéro de suivi dès que votre commande sera expédiée.</p>
             </div>
 
